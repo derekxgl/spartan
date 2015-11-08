@@ -82,12 +82,10 @@ int main(int argc, char *argv[]) {
 
   size_t i = 0;
   size_t count = 0;
-  char buf[2048];
   while (i < file.size() && count < 1000000) {
     int len =
         __builtin_bswap16(*reinterpret_cast<const uint16_t *>(file.data() + i));
-    memcpy(buf, file.data() + i + 2, len);
-    parser.ParseMessage(0, buf);
+    parser.ParseMessage(0, file.data() + i + 2);
     count++;
     i += len + 2;
   }
@@ -100,9 +98,8 @@ int main(int argc, char *argv[]) {
   while (i < file.size()) {
     int len =
         __builtin_bswap16(*reinterpret_cast<const uint16_t *>(file.data() + i));
-    memcpy(buf, file.data() + i + 2, len);
     auto start = rdtscp();
-    parser.ParseMessage(0, buf);
+    parser.ParseMessage(0, file.data() + i + 2);
     auto stop = rdtscp();
     auto diff = (stop - start - overhead) / speed;
     if (diff < 10000000000) {
